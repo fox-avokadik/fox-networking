@@ -16,11 +16,11 @@ func checkSample01() {
   final class ClientDelegate: APIClientDelegate {
     private var accessToken: String = ""
     
-    func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws {
+    func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
       request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
     }
     
-    func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+    func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
       if case .unacceptableStatusCode(let statusCode) = error as? APIError,
          statusCode == 401, attempts == 1 {
         accessToken = try await refreshAccessToken()

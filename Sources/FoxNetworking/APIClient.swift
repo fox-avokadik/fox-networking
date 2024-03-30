@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 
 /// Performs network requests constructed using ``Request``.
-public actor APIClientClient {
+public actor APIClient {
   /// The configuration with which the client was initialized with.
   public nonisolated let configuration: Configuration
   /// The underlying `URLSession` instance.
@@ -62,7 +62,7 @@ public actor APIClientClient {
   ///
   /// - parameter baseURL: A base URL. For example, `"https://api.github.com"`.
   /// - parameter configure: Updates the client configuration.
-  public init(baseURL: URL?, _ configure: @Sendable (inout APIClientClient.Configuration) -> Void = { _ in }) {
+  public init(baseURL: URL?, _ configure: @Sendable (inout APIClient.Configuration) -> Void = { _ in }) {
     var configuration = Configuration(baseURL: baseURL)
     configure(&configuration)
     self.init(configuration: configuration)
@@ -72,7 +72,7 @@ public actor APIClientClient {
   ///
   /// - parameter baseURL: A base URL. For example, `"https://api.github.com"`.
   /// - parameter configure: Updates the client configuration.
-  public convenience init(baseURL: URL?, _ configure: (inout APIClientClient.Configuration) -> Void = { _ in }) {
+  public convenience init(baseURL: URL?, _ configure: (inout APIClient.Configuration) -> Void = { _ in }) {
     var configuration = Configuration(baseURL: baseURL)
     configure(&configuration)
     self.init(configuration: configuration)

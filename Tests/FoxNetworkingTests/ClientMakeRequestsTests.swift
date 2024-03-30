@@ -14,7 +14,7 @@ import FoundationNetworking
 #endif
 
 final class ClientMakeRequestsTests: XCTestCase {
-  var client: APIClientClient!
+  var client: APIClient!
   
   override func setUp() {
     super.setUp()
@@ -70,7 +70,7 @@ final class ClientMakeRequestsTests: XCTestCase {
   
   func testBaseURLWithPathComponent() async throws {
     // GIVEN
-    let client = APIClientClient(baseURL: URL(string: "https://gitlab.com/api/v4"))
+    let client = APIClient(baseURL: URL(string: "https://gitlab.com/api/v4"))
     let request = Request(path: "/test")
     
     // WHEN
@@ -139,7 +139,7 @@ final class ClientMakeRequestsTests: XCTestCase {
   
   func testOverrideAcceptAndContentTypeHeadersUsingSessionConfiguration() async throws {
     // GIVEN
-    let client = APIClientClient(baseURL: URL(string: "https://api.github.com")) {
+    let client = APIClient(baseURL: URL(string: "https://api.github.com")) {
       $0.sessionConfiguration.httpAdditionalHeaders = [
         "Content-Type": "application/xml",
         "Accept": "application/xml"

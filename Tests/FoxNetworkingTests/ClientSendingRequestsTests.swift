@@ -14,7 +14,7 @@ import FoundationNetworking
 #endif
 
 final class ClientSendingRequestsTests: XCTestCase {
-  var client: APIClientClient!
+  var client: APIClient!
   
   override func setUp() {
     super.setUp()
@@ -236,12 +236,12 @@ final class ClientSendingRequestsTests: XCTestCase {
   func testRetries() async throws {
     // GIVEN
     final class RetryingDelegate: APIClientDelegate {
-      func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+      func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
         attempts < 3
       }
     }
     
-    let client = APIClientClient.mock {
+    let client = APIClient.mock {
       $0.delegate = RetryingDelegate()
     }
     
@@ -272,7 +272,7 @@ final class ClientSendingRequestsTests: XCTestCase {
   func testDecodingFailureDoesntStartRetry() async throws {
     // GIVEN
     final class RetryingDelegate: APIClientDelegate {
-      func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+      func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
         XCTFail("Retries are not expected to be called")
         return false
       }

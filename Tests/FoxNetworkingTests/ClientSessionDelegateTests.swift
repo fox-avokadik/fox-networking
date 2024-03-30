@@ -11,7 +11,7 @@ import XCTest
 #if !os(Linux)
 final class APIClientSessionDelegateTests: XCTestCase {
   private let delegate = SessionDelegate()
-  private var client: APIClientClient!
+  private var client: APIClient!
   
   override func setUp() {
     super.setUp()

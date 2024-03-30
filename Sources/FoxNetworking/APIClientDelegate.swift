@@ -20,7 +20,7 @@ public protocol APIClientDelegate {
   /// - parameters:
   ///   - client: The client that sends the request.
   ///   - request: The request about to be sent. Can be modified
-  func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws
+  func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws
   
   /// Validates response for the given request.
   ///
@@ -33,7 +33,7 @@ public protocol APIClientDelegate {
   /// - throws: An error to be returned to the user. By default, throws
   /// ``APIError/unacceptableStatusCode(_:)`` if the code is outside of
   /// the `200..<300` range.
-  func client(_ client: APIClientClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws
+  func client(_ client: APIClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws
   
   /// Gets called after a networking failure. Only one retry attempt is allowed.
   ///
@@ -48,7 +48,7 @@ public protocol APIClientDelegate {
   ///   - attempts: The number of already performed attempts.
   ///
   /// - returns: Return `true` to retry the request.
-  func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool
+  func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool
   
   /// Constructs URL for the given request.
   ///
@@ -59,7 +59,7 @@ public protocol APIClientDelegate {
   ///
   /// - returns: The URL for the request. Return `nil` to use the default
   /// logic used by client.
-  func client<T>(_ client: APIClientClient, makeURLForRequest request: Request<T>) throws -> URL?
+  func client<T>(_ client: APIClient, makeURLForRequest request: Request<T>) throws -> URL?
   
   /// Allows you to override the client's encoder for a specific request.
   ///
@@ -68,7 +68,7 @@ public protocol APIClientDelegate {
   ///   - request: The request about to be sent.
   /// - Returns: The JSONEncoder for the request. Return `nil` to use the default
   /// encoder set in the client.
-  func client<T>(_ client: APIClientClient, encoderForRequest request: Request<T>) -> JSONEncoder?
+  func client<T>(_ client: APIClient, encoderForRequest request: Request<T>) -> JSONEncoder?
   
   /// Allows you to override the client's decoder for a specific request.
   ///
@@ -77,33 +77,33 @@ public protocol APIClientDelegate {
   ///   - request: The request that was performed.
   /// - Returns: The JSONDecoder for the request. Return `nil` to use the default
   /// decoder set in the client.
-  func client<T>(_ client: APIClientClient, decoderForRequest request: Request<T>) -> JSONDecoder?
+  func client<T>(_ client: APIClient, decoderForRequest request: Request<T>) -> JSONDecoder?
 }
 
 public extension APIClientDelegate {
-  func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws {
+  func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
     // Do nothing
   }
   
-  func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+  func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
     false // Disabled by default
   }
   
-  func client(_ client: APIClientClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws {
+  func client(_ client: APIClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws {
     guard (200..<300).contains(response.statusCode) else {
       throw APIError.unacceptableStatusCode(response.statusCode)
     }
   }
   
-  func client<T>(_ client: APIClientClient, makeURLForRequest request: Request<T>) throws -> URL? {
+  func client<T>(_ client: APIClient, makeURLForRequest request: Request<T>) throws -> URL? {
     nil // Use default handlings
   }
   
-  func client<T>(_ client: APIClientClient, encoderForRequest request: Request<T>) -> JSONEncoder? {
+  func client<T>(_ client: APIClient, encoderForRequest request: Request<T>) -> JSONEncoder? {
     nil
   }
   
-  func client<T>(_ client: APIClientClient, decoderForRequest request: Request<T>) -> JSONDecoder? {
+  func client<T>(_ client: APIClient, decoderForRequest request: Request<T>) -> JSONDecoder? {
     nil
   }
 }

@@ -8,9 +8,9 @@
 import XCTest
 import FoxNetworking
 
-extension APIClientClient {
-  static func mock(_ configure: (inout APIClientClient.Configuration) -> Void = { _ in }) -> APIClientClient {
-    APIClientClient(baseURL: URL(string: "https://api.github.com")) {
+extension APIClient {
+  static func mock(_ configure: (inout APIClient.Configuration) -> Void = { _ in }) -> APIClient {
+    APIClient(baseURL: URL(string: "https://api.github.com")) {
       $0.sessionConfiguration.protocolClasses = [MockingURLProtocol.self]
       $0.sessionConfiguration.urlCache = nil
       configure(&$0)

@@ -98,11 +98,11 @@ enum GitHubError: Error {
 }
 
 private final class GitHubAPIClientDelegate: APIClientDelegate {
-  func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws {
+  func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
     request.setValue("Bearer \("your-access-token")", forHTTPHeaderField: "Authorization")
   }
   
-  func shouldClientRetry(_ client: APIClientClient, for request: URLRequest, withError error: Error) async throws -> Bool {
+  func shouldClientRetry(_ client: APIClient, for request: URLRequest, withError error: Error) async throws -> Bool {
     if case .unacceptableStatusCode(let status) = (error as? GitHubError), status == 401 {
       return await refreshAccessToken()
     }
@@ -114,7 +114,7 @@ private final class GitHubAPIClientDelegate: APIClientDelegate {
     return false
   }
   
-  func client(_ client: APIClientClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws {
+  func client(_ client: APIClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws {
     guard (200..<300).contains(response.statusCode) else {
       throw GitHubError.unacceptableStatusCode(response.statusCode)
     }
@@ -124,7 +124,7 @@ private final class GitHubAPIClientDelegate: APIClientDelegate {
 // MARK: - Usage
 
 func usage() async throws {
-  let client = APIClientClient(baseURL: URL(string: "https://api.github.com")) {
+  let client = APIClient(baseURL: URL(string: "https://api.github.com")) {
     $0.delegate = GitHubAPIClientDelegate()
   }
   

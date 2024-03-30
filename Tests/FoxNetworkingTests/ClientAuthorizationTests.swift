@@ -12,13 +12,13 @@ import FoundationNetworking
 @testable import FoxNetworking
 
 final class APIClientAuthorizationTests: XCTestCase {
-  var client: APIClientClient!
+  var client: APIClient!
   private let delegate = MockAuthorizingDelegate()
   
   override func setUp() {
     super.setUp()
     
-    client = APIClientClient.mock {
+    client = APIClient.mock {
       $0.delegate = delegate
     }
   }
@@ -78,11 +78,11 @@ final class APIClientAuthorizationTests: XCTestCase {
     struct WillSendFailed: Error {}
     
     class MockFailingDelegate: APIClientDelegate {
-      func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws {
+      func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
         throw WillSendFailed()
       }
       
-      func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+      func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
         XCTFail()
         return false
       }
@@ -106,7 +106,7 @@ private final class MockAuthorizingDelegate: APIClientDelegate {
   var token: Token!
   let tokenRefresher = TokenRefresher()
   
-  func client(_ client: APIClientClient, willSendRequest request: inout URLRequest) async throws {
+  func client(_ client: APIClient, willSendRequest request: inout URLRequest) async throws {
     let now = Date()
     
     // Refresh the token if it has expired.
@@ -117,7 +117,7 @@ private final class MockAuthorizingDelegate: APIClientDelegate {
     request.addValue("token \(token.value)", forHTTPHeaderField: "Authorization")
   }
   
-  func client(_ client: APIClientClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
+  func client(_ client: APIClient, shouldRetry task: URLSessionTask, error: Error, attempts: Int) async throws -> Bool {
     if case .unacceptableStatusCode(let statusCode) = error as? APIError,
        statusCode == 401, attempts == 1 {
       token = try await tokenRefresher.refreshToken()

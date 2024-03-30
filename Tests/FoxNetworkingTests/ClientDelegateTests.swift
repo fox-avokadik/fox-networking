@@ -19,7 +19,7 @@ final class ClientDelegateTests: XCTestCase {
   func testOverridingQueryItemsEncoding() async throws {
     // GIVEN
     class ClientDelegate: APIClientDelegate {
-      func client<T>(_ client: APIClientClient, makeURLForRequest request: Request<T>) throws -> URL? {
+      func client<T>(_ client: APIClient, makeURLForRequest request: Request<T>) throws -> URL? {
         var components = URLComponents(url: client.configuration.baseURL!.appendingPathComponent(request.url!.absoluteString), resolvingAgainstBaseURL: false)!
         if let query = request.query, !query.isEmpty {
           func encode(_ string: String) -> String {
@@ -39,7 +39,7 @@ final class ClientDelegateTests: XCTestCase {
       }
     }
     
-    let client = APIClientClient.mock {
+    let client = APIClient.mock {
       $0.delegate = ClientDelegate()
     }
     
