@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct APIErrorModel: Decodable, Error {
+public struct APIErrorModel: Decodable {
   let message: String
   let code: String
 }
