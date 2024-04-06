@@ -90,17 +90,19 @@ public extension APIClientDelegate {
   }
   
   func client(_ client: APIClient, validateResponse response: HTTPURLResponse, data: Data, task: URLSessionTask) throws {
-    guard (400..<500).contains(response.statusCode) else {
-      let resultError = try JSONDecoder().decode(APIErrorModel.self, from: data)
-      
-      throw APIError.clientErrorCode(resultError)
-    }
-    
     guard (200..<300).contains(response.statusCode) else {
+      if response.statusCode >= 500 {
+        throw APIError.internalServerError
+      }
+     
+      if response.statusCode >= 400 && response.statusCode < 500 {
+        let resultError = try JSONDecoder().decode(APIErrorModel.self, from: data)
+        
+        throw APIError.clientErrorCode(resultError)
+      }
+
       throw APIError.unacceptableStatusCode(response.statusCode)
     }
-    
-
   }
   
   func client<T>(_ client: APIClient, makeURLForRequest request: Request<T>) throws -> URL? {
