@@ -409,15 +409,26 @@ public actor APIClient {
   }
 }
 
+public struct APIErrorModel: Decodable {
+  let message: String
+  let code: String
+}
+
 /// Represents an error encountered by the client.
 public enum APIError: Error, LocalizedError {
   case unacceptableStatusCode(Int)
+  case clientErrorCode(APIErrorModel)
+  case internalServerError
   
   /// Returns the debug description.
-  public var errorDescription: String? {
+  public var errorDescription: Any {
     switch self {
     case .unacceptableStatusCode(let statusCode):
       return "Response status code was unacceptable: \(statusCode)."
+    case .clientErrorCode(let apiError):
+      return apiError
+    case .internalServerError:
+      return "Internal Server Error"
     }
   }
 }

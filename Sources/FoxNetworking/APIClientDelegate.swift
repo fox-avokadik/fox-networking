@@ -93,6 +93,12 @@ public extension APIClientDelegate {
     guard (200..<300).contains(response.statusCode) else {
       throw APIError.unacceptableStatusCode(response.statusCode)
     }
+    
+    guard (400..<500).contains(response.statusCode) else {
+      let resultError = try JSONDecoder().decode(APIErrorModel.self, from: data)
+      
+      throw APIError.clientErrorCode(resultError)
+    }
   }
   
   func client<T>(_ client: APIClient, makeURLForRequest request: Request<T>) throws -> URL? {
