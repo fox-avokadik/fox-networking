@@ -409,11 +409,6 @@ public actor APIClient {
   }
 }
 
-public struct APIErrorModel: Decodable {
-  let message: String
-  let code: String
-}
-
 /// Represents an error encountered by the client.
 public enum APIError: Error, LocalizedError {
   case unacceptableStatusCode(Int)
