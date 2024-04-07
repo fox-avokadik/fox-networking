@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  APIErrorModel.swift
 //  
 //
 //  Created by Stepan Bezhuk on 06.04.2024.
