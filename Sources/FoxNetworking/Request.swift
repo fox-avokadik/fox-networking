@@ -27,14 +27,7 @@ public struct Request<Response>: @unchecked Sendable {
   public var id: String?
   
   /// Initialiazes the request with the given parameters.
-  public init(
-    url: URL,
-    method: HTTPMethod = .get,
-    query: [(String, String?)]? = nil,
-    body: Encodable? = nil,
-    headers: [String: String]? = nil,
-    id: String? = nil
-  ) {
+  public init(url: URL, method: HTTPMethod = .get, query: [(String, String?)]? = nil, body: Encodable? = nil, headers: [String: String]? = nil, id: String? = nil) {
     self.method = method
     self.url = url
     self.query = query
@@ -44,14 +37,7 @@ public struct Request<Response>: @unchecked Sendable {
   }
   
   /// Initializes the request with the given parameters.
-  public init(
-    path: String,
-    method: HTTPMethod = .get,
-    query: [(String, String?)]? = nil,
-    body: Encodable? = nil,
-    headers: [String: String]? = nil,
-    id: String? = nil
-  ) {
+  public init(path: String, method: HTTPMethod = .get, query: [(String, String?)]? = nil, body: Encodable? = nil, headers: [String: String]? = nil, id: String? = nil) {
     self.method = method
     self.url = URL(string: path.isEmpty ? "/" : path)
     self.query = query
@@ -78,14 +64,7 @@ public struct Request<Response>: @unchecked Sendable {
 
 extension Request where Response == Void {
   /// Initialiazes the request with the given parameters.
-  public init(
-    url: URL,
-    method: HTTPMethod = .get,
-    query: [(String, String?)]? = nil,
-    body: Encodable? = nil,
-    headers: [String: String]? = nil,
-    id: String? = nil
-  ) {
+  public init(url: URL, method: HTTPMethod = .get, query: [(String, String?)]? = nil, body: Encodable? = nil, headers: [String: String]? = nil, id: String? = nil) {
     self.method = method
     self.url = url
     self.query = query
@@ -95,14 +74,7 @@ extension Request where Response == Void {
   }
   
   /// Initialiazes the request with the given parameters.
-  public init(
-    path: String,
-    method: HTTPMethod = .get,
-    query: [(String, String?)]? = nil,
-    body: Encodable? = nil,
-    headers: [String: String]? = nil,
-    id: String? = nil
-  ) {
+  public init(path: String, method: HTTPMethod = .get, query: [(String, String?)]? = nil, body: Encodable? = nil, headers: [String: String]? = nil, id: String? = nil) {
     self.method = method
     self.url = URL(string: path.isEmpty ? "/" : path)
     self.query = query

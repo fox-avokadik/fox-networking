@@ -40,11 +40,7 @@ public actor APIClient {
     public var encoder: JSONEncoder
     
     /// Initializes the configuration.
-    public init(
-      baseURL: URL?,
-      sessionConfiguration: URLSessionConfiguration = .default,
-      delegate: APIClientDelegate? = nil
-    ) {
+    public init(baseURL: URL?, sessionConfiguration: URLSessionConfiguration = .default, delegate: APIClientDelegate? = nil) {
       self.baseURL = baseURL
       self.sessionConfiguration = sessionConfiguration
       self.delegate = delegate
@@ -101,11 +97,7 @@ public actor APIClient {
   ///
   /// - returns: A response with a decoded body. If the response type is
   /// optional and the response body is empty, returns `nil`.
-  @discardableResult public func send<T: Decodable>(
-    _ request: Request<T>,
-    delegate: URLSessionDataDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<T> {
+  @discardableResult public func send<T: Decodable>(_ request: Request<T>, delegate: URLSessionDataDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<T> {
     let response = try await data(for: request, delegate: delegate, configure: configure)
     let decoder = self.delegate.client(self, decoderForRequest: request) ?? self.decoder
     let value: T = try await decode(response.data, using: decoder)
@@ -120,11 +112,7 @@ public actor APIClient {
   ///   - configure: Modifies the underlying `URLRequest` before sending it.
   ///
   /// - returns: A response with an empty value.
-  @discardableResult public func send(
-    _ request: Request<Void>,
-    delegate: URLSessionDataDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<Void> {
+  @discardableResult public func send(_ request: Request<Void>, delegate: URLSessionDataDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<Void> {
     try await data(for: request, delegate: delegate, configure: configure).map { _ in () }
   }
   
@@ -138,11 +126,7 @@ public actor APIClient {
   ///   - configure: Modifies the underlying `URLRequest` before sending it.
   ///
   /// - returns: A response with a raw response data.
-  public func data<T>(
-    for request: Request<T>,
-    delegate: URLSessionDataDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<Data> {
+  public func data<T>(for request: Request<T>, delegate: URLSessionDataDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<Data> {
     let request = try await makeURLRequest(for: request, configure)
     return try await performRequest {
       var request = request
@@ -172,11 +156,7 @@ public actor APIClient {
   /// - returns: A response with the location of the downloaded file. The file
   /// will not be removed automatically until the app restarts. Make sure to
   /// move the file to a known location in your app.
-  public func download<T>(
-    for request: Request<T>,
-    delegate: URLSessionDownloadDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<URL> {
+  public func download<T>(for request: Request<T>, delegate: URLSessionDownloadDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<URL> {
     var urlRequest = try await makeURLRequest(for: request, configure)
     try await self.delegate.client(self, willSendRequest: &urlRequest)
     let task = session.downloadTask(with: urlRequest)
@@ -187,18 +167,12 @@ public actor APIClient {
   ///
   /// - parameters:
   ///   - delegate: A task-specific delegate.
-  public func download(
-    resumeFrom resumeData: Data,
-    delegate: URLSessionDownloadDelegate? = nil
-  ) async throws -> Response<URL> {
+  public func download(resumeFrom resumeData: Data, delegate: URLSessionDownloadDelegate? = nil) async throws -> Response<URL> {
     let task = session.downloadTask(withResumeData: resumeData)
     return try await _startDownloadTask(task, delegate: delegate)
   }
   
-  private func _startDownloadTask(
-    _ task: URLSessionDownloadTask,
-    delegate: URLSessionDownloadDelegate?
-  ) async throws -> Response<URL> {
+  private func _startDownloadTask(_ task: URLSessionDownloadTask, delegate: URLSessionDownloadDelegate?) async throws -> Response<URL> {
     let response = try await dataLoader.startDownloadTask(task, session: session, delegate: delegate)
     try validate(response)
     return response
@@ -218,12 +192,7 @@ public actor APIClient {
   ///
   /// - returns: A response with a decoded body. If the response type is
   /// optional and the response body is empty, returns `nil`.
-  @discardableResult public func upload<T: Decodable>(
-    for request: Request<T>,
-    fromFile fileURL: URL,
-    delegate: URLSessionTaskDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<T> {
+  @discardableResult public func upload<T: Decodable>(for request: Request<T>, fromFile fileURL: URL, delegate: URLSessionTaskDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<T> {
     let response = try await _upload(for: request, fromFile: fileURL, delegate: delegate, configure: configure)
     let decoder = self.delegate.client(self, decoderForRequest: request) ?? self.decoder
     let value: T = try await decode(response.data, using: decoder)
@@ -239,21 +208,11 @@ public actor APIClient {
   ///   - configure: Modifies the underlying `URLRequest` before sending it.
   ///
   /// - returns: Empry response.
-  @discardableResult public func upload(
-    for request: Request<Void>,
-    fromFile fileURL: URL,
-    delegate: URLSessionTaskDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<Void> {
+  @discardableResult public func upload(for request: Request<Void>, fromFile fileURL: URL, delegate: URLSessionTaskDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<Void> {
     try await _upload(for: request, fromFile: fileURL, delegate: delegate, configure: configure).map { _ in () }
   }
   
-  private func _upload<T>(
-    for request: Request<T>,
-    fromFile fileURL: URL,
-    delegate: URLSessionTaskDelegate?,
-    configure: ((inout URLRequest) throws -> Void)?
-  ) async throws -> Response<Data> {
+  private func _upload<T>(for request: Request<T>, fromFile fileURL: URL, delegate: URLSessionTaskDelegate?, configure: ((inout URLRequest) throws -> Void)?) async throws -> Response<Data> {
     let request = try await makeURLRequest(for: request, configure)
     return try await performRequest {
       var request = request
@@ -281,12 +240,7 @@ public actor APIClient {
   ///
   /// - returns: A response with a decoded body. If the response type is
   /// optional and the response body is empty, returns `nil`.
-  @discardableResult public func upload<T: Decodable>(
-    for request: Request<T>,
-    from data: Data,
-    delegate: URLSessionTaskDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<T> {
+  @discardableResult public func upload<T: Decodable>(for request: Request<T>, from data: Data, delegate: URLSessionTaskDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<T> {
     let response = try await _upload(for: request, from: data, delegate: delegate, configure: configure)
     let decoder = self.delegate.client(self, decoderForRequest: request) ?? self.decoder
     let value: T = try await decode(response.data, using: decoder)
@@ -302,21 +256,11 @@ public actor APIClient {
   ///   - configure: Modifies the underlying `URLRequest` before sending it.
   ///
   /// Returns decoded response.
-  @discardableResult public func upload(
-    for request: Request<Void>,
-    from data: Data,
-    delegate: URLSessionTaskDelegate? = nil,
-    configure: ((inout URLRequest) throws -> Void)? = nil
-  ) async throws -> Response<Void> {
+  @discardableResult public func upload(for request: Request<Void>, from data: Data, delegate: URLSessionTaskDelegate? = nil, configure: ((inout URLRequest) throws -> Void)? = nil) async throws -> Response<Void> {
     try await _upload(for: request, from: data, delegate: delegate, configure: configure).map { _ in () }
   }
   
-  private func _upload<T>(
-    for request: Request<T>,
-    from data: Data,
-    delegate: URLSessionTaskDelegate?,
-    configure: ((inout URLRequest) throws -> Void)?
-  ) async throws -> Response<Data> {
+  private func _upload<T>(for request: Request<T>, from data: Data, delegate: URLSessionTaskDelegate?, configure: ((inout URLRequest) throws -> Void)?) async throws -> Response<Data> {
     let request = try await makeURLRequest(for: request, configure)
     return try await performRequest {
       var request = request
@@ -339,10 +283,7 @@ public actor APIClient {
     try await makeURLRequest(for: request, { _ in })
   }
   
-  private func makeURLRequest<T>(
-    for request: Request<T>,
-    _ configure: ((inout URLRequest) throws -> Void)?
-  ) async throws -> URLRequest {
+  private func makeURLRequest<T>(for request: Request<T>, _ configure: ((inout URLRequest) throws -> Void)?) async throws -> URLRequest {
     let url = try makeURL(for: request)
     var urlRequest = URLRequest(url: url)
     urlRequest.allHTTPHeaderFields = request.headers
@@ -416,14 +357,25 @@ public enum APIError: Error, LocalizedError {
   case internalServerError
   
   /// Returns the debug description.
-  public var errorDescription: Any {
+  public var errorDescription: String {
     switch self {
     case .unacceptableStatusCode(let statusCode):
       return "Response status code was unacceptable: \(statusCode)."
     case .clientErrorCode(let apiError):
-      return apiError
+      return apiError.message
     case .internalServerError:
       return "Internal Server Error"
+    }
+  }
+  
+  public var errorCode: String {
+    switch self {
+    case .unacceptableStatusCode(_):
+      return "unacceptable_api_error"
+    case .clientErrorCode(let apiError):
+      return apiError.code
+    case .internalServerError:
+      return "internal_server_error"
     }
   }
 }
