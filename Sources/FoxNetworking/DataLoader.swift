@@ -335,14 +335,6 @@ struct DataLoaderError: Error {
   let error: Error
 }
 
-struct AnyEncodable: Encodable {
-  let value: Encodable
-  
-  func encode(to encoder: Encoder) throws {
-    try value.encode(to: encoder)
-  }
-}
-
 extension OperationQueue {
   static func serial() -> OperationQueue {
     let queue = OperationQueue()
@@ -353,14 +345,14 @@ extension OperationQueue {
 
 extension Optional: OptionalDecoding {}
 
-func encode(_ value: Encodable, using encoder: JSONEncoder) async throws -> Data? {
+func encode(_ value: some Encodable, using encoder: JSONEncoder) async throws -> Data? {
   if let data = value as? Data {
     return data
   } else if let string = value as? String {
     return string.data(using: .utf8)
   } else {
     return try await Task.detached {
-      try encoder.encode(AnyEncodable(value: value))
+      try encoder.encode(value)
     }.value
   }
 }
